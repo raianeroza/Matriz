@@ -39,5 +39,14 @@ main()
 	}
 	printf("\n--------Zerando a primeira coluna--------\n");
 	imprimi(m);
+
+	for(i=2; i<L; i++)
+	{
+		pivo = m[i][1] / m[0][0];
+		for(j=0; j<C; j++)
+			m[i][j] = m[i][j] - (pivo * m[1][j]);
+	}
+	printf("\n--------Matriz na forma Triangular--------\n");
+	imprimi(m);
 }
 
