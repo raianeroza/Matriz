@@ -48,5 +48,8 @@ main()
 	}
 	printf("\n--------Matriz na forma Triangular--------\n");
 	imprimi(m);
+
+	b = m[L-1][C-1];
+	x[3] = b / m[L-1][C-2];
 }
 
