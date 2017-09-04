@@ -61,5 +61,12 @@ main()
 
 		aux=0;
 	}
+
+	printf("\n--------Solução da Equação--------\n");
+	for(i=0; i<L; i++)
+		printf("X%d = %d \t", i+1, x[i]);
+	printf("\n\n");
+
+	fclose(op);
 }
 
