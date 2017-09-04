@@ -30,5 +30,14 @@ main()
 
 	printf("\t\n--------Matriz Aumentada--------\n");
 	imprimi(m);
+
+	for(i=1; i<L; i++)
+	{
+		pivo = m[i][0] / m[0][0];
+		for(j=0; j<C; j++)
+			m[i][j] = m[i][j] - (pivo * m[0][j]);
+	}
+	printf("\n--------Zerando a primeira coluna--------\n");
+	imprimi(m);
 }
 
