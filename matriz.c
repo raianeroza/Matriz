@@ -51,5 +51,15 @@ main()
 
 	b = m[L-1][C-1];
 	x[3] = b / m[L-1][C-2];
+
+	for(i=L-1; i>=0; i--)
+	{
+		b = m[i][C-1];
+		for(j=i+1; j<L; j++)
+			aux += m[i][j]*x[j];
+		x[i] = (b - aux) / m[i][i];
+
+		aux=0;
+	}
 }
 
