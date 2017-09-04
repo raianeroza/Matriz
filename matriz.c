@@ -42,7 +42,7 @@ main()
 
 	for(i=2; i<L; i++)
 	{
-		pivo = m[i][1] / m[0][0];
+		pivo = m[i][1] / m[1][1];
 		for(j=0; j<C; j++)
 			m[i][j] = m[i][j] - (pivo * m[1][j]);
 	}
