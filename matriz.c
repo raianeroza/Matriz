@@ -1,46 +1,82 @@
 #include <stdio.h>
 
-#define L 4
-#define C 5
+#define L 3
+#define C 4
 
 FILE *op;
 
-void imprimi(int m[L][C])
+void imprimi(float m[L][C])
 {
 	int i, j;
 
 	for(i=0; i<L; i++)
 	{
 		for(j=0; j<C; j++)
-			printf("%d\t", m[i][j]);
+			printf("%.1f\t", m[i][j]);
 		printf("\n");
 	}
 	printf("\n");
 }
 main()
 {
-	int m[L][C], pivo, x[L], b, aux=0, i, j;
-	op=fopen("Arquivo.dat","r");
+	float m[L][C], pivo, x[L], b, aux=0.0, maux[L][C];
+	int i, j, k;
+	
+	op=fopen("dados.dat","r");
 
 	for(i=0; i<L; i++)
 	{
 		for(j=0; j<C; j++)
-			fscanf(op,"%d\t", &m[i][j]);
+			fscanf(op,"%f\t", &m[i][j]);
 	}
 
 	printf("\t\n--------Matriz Aumentada--------\n");
+	imprimi(m);
+	
+	//Vericando o maior elemento da 1ºcoluna
+	for(k=0; k<L; k++)
+	{
+		if(m[k][k]!=0.0 )
+		{
+			if(m[k][k] < m[k+1][k])
+			{
+				//printf("ola\n");
+				for(i=0; i<C; i++)
+				{
+					//printf("ola\n");
+					maux[k+1][i]=m[k][i];
+					m[k][i] = m[k+1][i];
+					m[k+1][i] = maux[k+1][i];
+				}
+				
+				//Imprimindo a troca de linha
+				printf("\nTrocando as linhas\n");
+				imprimi(m);
+			}
+		}
+		else
+		{
+		
+		}
+		
+	}
+	
+	//Imprimindo a troca de linha
+	printf("\nTrocando as linhas\n");
 	imprimi(m);
 
 	for(i=1; i<L; i++)
 	{
 		pivo = m[i][0] / m[0][0];
+		printf("%.1f", pivo);
 		for(j=0; j<C; j++)
 			m[i][j] = m[i][j] - (pivo * m[0][j]);
 	}
+        
 	printf("\n--------Zerando a primeira coluna--------\n");
 	imprimi(m);
 
-	for(i=2; i<L; i++)
+	/*for(i=2; i<L; i++)
 	{
 		pivo = m[i][1] / m[1][1];
 		for(j=0; j<C; j++)
@@ -64,8 +100,8 @@ main()
 
 	printf("\n--------Solução da Equação--------\n");
 	for(i=0; i<L; i++)
-		printf("X%d = %d \t", i+1, x[i]);
-	printf("\n\n");
+		printf("X%d = %.1f \t", i+1, x[i]);
+	printf("\n\n");*/
 
 	fclose(op);
 }
