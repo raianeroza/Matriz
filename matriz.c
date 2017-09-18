@@ -1,8 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <time.h>
 
 FILE *op;
+
+double **gera(int dim)
+{
+	int i, j, k;
+	double **M;
+
+	srand((unsigned)time(NULL));
+	M = malloc(dim*sizeof(double *));
+	for(i=0; i<dim; i++)
+	{
+		M[i] = (double *)malloc((dim+1)*sizeof(double));
+		for(i=0; i<dim; i++)
+		{
+			for(j=0; j<=dim; j++)
+				M[i][j] = rand()%20 - 10;
+		}
+	}
+
+	return(M);
+}
 
 void imprimi(double **M, int dim)
 {
@@ -116,7 +136,7 @@ main()
 
 	M = malloc( dim*sizeof(double *) );
 
-	for(i=0; i<L; i++)
+	for(i=0; i<dim; i++)
 		M[i] = malloc((dim+1)*sizeof(double));
 	i=j=0;
 
@@ -134,7 +154,7 @@ main()
 
 
 	printf("\t\n--------Matriz Aumentada--------\n");
-	imprimi(m);
+	imprimi(M, dim);
 
 	//fazendo o pivotamento da Matriz
 	k=troca(M, dim);
