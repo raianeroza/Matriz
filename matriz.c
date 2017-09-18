@@ -19,20 +19,36 @@ void imprimi(float m[L][C])
 }
 main()
 {
-	float m[L][C], pivo, x[L], b, aux=0.0, maux[L][C];
-	int i, j, k;
-	
-	op=fopen("dados.dat","r");
+	double **M, a, aux, pivo, b;
+	int i, j, k, dim;
+
+	op=fopen("dados1.dat","r");
+	i=fscanf(op, "%d", &dim);
+
+	double x[dim+1];
+
+	M = malloc( dim*sizeof(double *) );
 
 	for(i=0; i<L; i++)
+		M[i] = malloc((dim+1)*sizeof(double));
+	i=j=0;
+
+	while(fscanf(op, "%lf", &a) != EOF)
 	{
-		for(j=0; j<C; j++)
-			fscanf(op,"%f\t", &m[i][j]);
+		M[i][j] = a;
+		j++;
+
+		if(j == dim+1)
+		{
+			j=0;
+			i++;
+		}
 	}
+
 
 	printf("\t\n--------Matriz Aumentada--------\n");
 	imprimi(m);
-	
+
 	//Vericando o maior elemento da 1ºcoluna
 	for(k=0; k<L; k++)
 	{
@@ -48,7 +64,7 @@ main()
 					m[k][i] = m[k+1][i];
 					m[k+1][i] = maux[k+1][i];
 				}
-				
+
 				//Imprimindo a troca de linha
 				printf("\nTrocando as linhas\n");
 				imprimi(m);
@@ -56,11 +72,11 @@ main()
 		}
 		else
 		{
-		
+
 		}
-		
+
 	}
-	
+
 	//Imprimindo a troca de linha
 	printf("\nTrocando as linhas\n");
 	imprimi(m);
@@ -72,7 +88,7 @@ main()
 		for(j=0; j<C; j++)
 			m[i][j] = m[i][j] - (pivo * m[0][j]);
 	}
-        
+
 	printf("\n--------Zerando a primeira coluna--------\n");
 	imprimi(m);
 
