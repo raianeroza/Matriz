@@ -1,28 +1,115 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-#define L 3
-#define C 4
 
 FILE *op;
 
-void imprimi(float m[L][C])
+void imprimi(double **M, int dim)
 {
 	int i, j;
 
-	for(i=0; i<L; i++)
+	for(i=0; i<dim; i++)
 	{
-		for(j=0; j<C; j++)
-			printf("%.1f\t", m[i][j]);
+		for(j=0; j<dim+1; j++)
+			printf("%lf\t", M[i][j]);
 		printf("\n");
 	}
 	printf("\n");
+}
+
+int troca(double **M, int dim)
+{
+	int i, j, cont=0, k;
+	double aux;
+
+	aux=M[0][0];
+	for(i=0; i<dim; i++)
+	{
+		if(aux < M[i][0])
+		{
+			aux=M[i][0];
+			k=i;
+		}
+	}
+
+	for(j=0; j<dim+1; j++)
+	{
+		aux = M[0][j];
+		M[0][j] = M[k][j];
+		M[k][j] = aux;
+		cont++;
+	}
+
+	printf("\n--------Pivotamento--------\n");
+	imprimi(M, dim);
+
+	return(aux);
+}
+
+void escalonamento(double **M, int dim)
+{
+	int i, j, v;
+	double pivo;
+
+	//Fazendo o escalonamento
+	for(v=0; v<dim-1; v++)
+	{
+		for(i=v+1; i<dim; i++)
+		{
+			pivo = (M[i][v] / M[v][v]);
+
+			for(j=v; j<dim+1; j++)
+				M[i][j] = M[i][j] - (pivo * M[v][j]);
+		}
+	}
+
+	imprimi(M, dim);
+}
+
+void Reversa(double **M, int dim)
+{
+	double b, x[dim+1], aux;
+	int i, j;
+
+	b = M[dim-1][(dim+1)-1];
+	x[3] = b / M[dim-1][(dim+1)-2];
+
+	for(i=dim-1; i>=0; i--)
+	{
+		b = M[i][(dim+1)-1];
+		for(j=i+1; j<dim; j++)
+			aux += M[i][j]*x[j];
+		x[i] = (b - aux) / M[i][i];
+
+		aux=0;
+	}
+
+	printf("\n--------Solução da Equação--------\n");
+	for(i=0; i<dim; i++)
+		printf("X%d = %lf \t", i+1, x[i]);
+	printf("\n\n");
+}
+
+void determinante(double **M, int dim, int cont)
+{
+	double det=1;
+	int i;
+
+	for(i=0; i<dim; i++)
+		det *= M[i][i];
+	printf("\n--------Determinante--------\n");
+
+	if(cont%2 == 0)
+		printf("%.2lf\n", det);
+	else
+		printf("%.2lf\n", -1.0*det);
 }
 main()
 {
 	double **M, a, aux, pivo, b;
 	int i, j, k, dim;
 
-	op=fopen("dados1.dat","r");
+	op=fopen("Arquivo.dat","r");
 	i=fscanf(op, "%d", &dim);
 
 	double x[dim+1];
@@ -49,75 +136,18 @@ main()
 	printf("\t\n--------Matriz Aumentada--------\n");
 	imprimi(m);
 
-	//Vericando o maior elemento da 1ºcoluna
-	for(k=0; k<L; k++)
-	{
-		if(m[k][k]!=0.0 )
-		{
-			if(m[k][k] < m[k+1][k])
-			{
-				//printf("ola\n");
-				for(i=0; i<C; i++)
-				{
-					//printf("ola\n");
-					maux[k+1][i]=m[k][i];
-					m[k][i] = m[k+1][i];
-					m[k+1][i] = maux[k+1][i];
-				}
+	//fazendo o pivotamento da Matriz
+	k=troca(M, dim);
+	printf("Número de trocas: %d\n", k);
 
-				//Imprimindo a troca de linha
-				printf("\nTrocando as linhas\n");
-				imprimi(m);
-			}
-		}
-		else
-		{
+	//Fazendo o escalonamento
+	escalonamento(M, dim);
 
-		}
+	//Substituição Reversa
+	Reversa(M, dim);
 
-	}
-
-	//Imprimindo a troca de linha
-	printf("\nTrocando as linhas\n");
-	imprimi(m);
-
-	for(i=1; i<L; i++)
-	{
-		pivo = m[i][0] / m[0][0];
-		printf("%.1f", pivo);
-		for(j=0; j<C; j++)
-			m[i][j] = m[i][j] - (pivo * m[0][j]);
-	}
-
-	printf("\n--------Zerando a primeira coluna--------\n");
-	imprimi(m);
-
-	/*for(i=2; i<L; i++)
-	{
-		pivo = m[i][1] / m[1][1];
-		for(j=0; j<C; j++)
-			m[i][j] = m[i][j] - (pivo * m[1][j]);
-	}
-	printf("\n--------Matriz na forma Triangular--------\n");
-	imprimi(m);
-
-	b = m[L-1][C-1];
-	x[3] = b / m[L-1][C-2];
-
-	for(i=L-1; i>=0; i--)
-	{
-		b = m[i][C-1];
-		for(j=i+1; j<L; j++)
-			aux += m[i][j]*x[j];
-		x[i] = (b - aux) / m[i][i];
-
-		aux=0;
-	}
-
-	printf("\n--------Solução da Equação--------\n");
-	for(i=0; i<L; i++)
-		printf("X%d = %.1f \t", i+1, x[i]);
-	printf("\n\n");*/
+	//Resolvendo o determinante
+	determinante(M, dim, k);
 
 	fclose(op);
 }
