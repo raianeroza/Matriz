@@ -37,53 +37,45 @@ void imprimi(double **M, int dim)
 	printf("\n");
 }
 
-int troca(double **M, int dim)
+int troca(double **M, int dim, int v)
 {
 	int i, j, cont=0, k;
 	double aux;
 
-	aux=M[0][0];
-	for(i=0; i<dim; i++)
+	for(i=v; i<dim; i++)
 	{
-		if(aux < M[i][0])
+		if(M[i][v] != 0)
 		{
-			aux=M[i][0];
-			k=i;
+			for(j=0; j<dim+1; j++)
+			{
+				aux = M[v][j];
+				M[v][j] = M[i][j];
+				M[i][j] = aux;
+			}
+			i = dim;
 		}
 	}
+	
+	cont++;
 
-	for(j=0; j<dim+1; j++)
-	{
-		aux = M[0][j];
-		M[0][j] = M[k][j];
-		M[k][j] = aux;
-		cont++;
-	}
-
-	printf("\n--------Pivotamento--------\n");
-	imprimi(M, dim);
-
-	return(aux);
+	return(cont);
 }
 
-void escalonamento(double **M, int dim)
+double escalonamento(double **M, int dim, int v)
 {
-	int i, j, v;
+	int i, j;
 	double pivo;
 
 	//Fazendo o escalonamento
-	for(v=0; v<dim-1; v++)
+	for(i=v+1; i<dim; i++)
 	{
-		for(i=v+1; i<dim; i++)
-		{
-			pivo = (M[i][v] / M[v][v]);
+		pivo = -1 * (M[i][v] / M[v][v]);
 
-			for(j=v; j<dim+1; j++)
-				M[i][j] = M[i][j] - (pivo * M[v][j]);
-		}
+		for(j=v; j<dim+1; j++)
+			M[i][j] = M[i][j] + (pivo * M[v][j]);
 	}
-
-	imprimi(M, dim);
+	
+	
 }
 
 void Reversa(double **M, int dim)
@@ -91,12 +83,12 @@ void Reversa(double **M, int dim)
 	double b, x[dim+1], aux;
 	int i, j;
 
-	b = M[dim-1][(dim+1)-1];
-	x[3] = b / M[dim-1][(dim+1)-2];
+	b = M[dim-1][dim];
+	x[3] = b / M[dim-1][dim-2];
 
 	for(i=dim-1; i>=0; i--)
 	{
-		b = M[i][(dim+1)-1];
+		b = M[i][dim];
 		for(j=i+1; j<dim; j++)
 			aux += M[i][j]*x[j];
 		x[i] = (b - aux) / M[i][i];
@@ -125,9 +117,35 @@ void determinante(double **M, int dim, int cont)
 		printf("%.2lf\n", -1.0*det);
 }
 
+double **LU(double **M, int dim, double **U)
+{
+	int i, j, k;
+	double **L, pivo, r;
+	
+	L = malloc(dim*sizeof(double *));
+	
+	for(k=0; k<dim; k++)
+	{
+		L[k][1] = M[k][1];
+		U[k][k] = 1;
+		U[1][j] = M[1][j] / L[1][1];
+	}
+	
+	for(i=1; i<dim; i++)
+	{
+			
+			r += L[i][k]*U[i][k];
+			for(j=1; j<dim ;j++)
+				L[i][j] = M[i][j] -r;
+	}
+	
+	imprimi(L, dim);
+}
+
+
 main(int argc, char *argv[] )
 {
-	double **M, a, aux, pivo, b;
+	double **M, **N, a, aux, pivo, b;
 	int i, j, k, dim, cont;
 
 	op=fopen(argv[1],"r");
@@ -136,7 +154,8 @@ main(int argc, char *argv[] )
 	double x[dim+1];
 
 	M = malloc( dim*sizeof(double *) );
-
+	
+	
 	for(i=0; i<dim; i++)
 		M[i] = malloc((dim+1)*sizeof(double));
 	i=j=0;
@@ -158,17 +177,31 @@ main(int argc, char *argv[] )
 	imprimi(M, dim);
 
 	//fazendo o pivotamento da Matriz
-	k=troca(M, dim);
-	printf("Número de trocas: %d\n", k);
-
+	for(i=0; i<dim; i++)
+	{
+		if(M[i][i] == 0)
+		{
+			k = troca(M, dim, i);
+			printf("\nNúmero de troca: %d\n", k);
+		}	
+		
+		if(M[i][i] != 0)
+			escalonamento(M, dim, i);
+	}
+	
 	//Fazendo o escalonamento
-	escalonamento(M, dim);
+	printf("\n--------Matriz Escalonada--------\n");
+	imprimi(M, dim);
 
 	//Substituição Reversa
 	Reversa(M, dim);
 
 	//Resolvendo o determinante
 	determinante(M, dim, k);
+	
+	//Decomposição LU
+	//LU(M, dim, N);
+	//imprimi(LU, dim);
 
 	fclose(op);
 }
