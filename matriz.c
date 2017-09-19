@@ -124,12 +124,13 @@ void determinante(double **M, int dim, int cont)
 	else
 		printf("%.2lf\n", -1.0*det);
 }
-main()
+
+main(int argc, char *argv[] )
 {
 	double **M, a, aux, pivo, b;
-	int i, j, k, dim;
+	int i, j, k, dim, cont;
 
-	op=fopen("Arquivo.dat","r");
+	op=fopen(argv[1],"r");
 	i=fscanf(op, "%d", &dim);
 
 	double x[dim+1];
