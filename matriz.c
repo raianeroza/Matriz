@@ -55,7 +55,6 @@ int troca(double **M, int dim, int v)
 			i = dim;
 		}
 	}
-	
 	cont++;
 
 	return(cont);
@@ -74,8 +73,7 @@ double escalonamento(double **M, int dim, int v)
 		for(j=v; j<dim+1; j++)
 			M[i][j] = M[i][j] + (pivo * M[v][j]);
 	}
-	
-	
+
 }
 
 void Reversa(double **M, int dim)
@@ -117,28 +115,34 @@ void determinante(double **M, int dim, int cont)
 		printf("%.2lf\n", -1.0*det);
 }
 
-double **LU(double **M, int dim, double **U)
+double **LU(double **M, int dim)
 {
 	int i, j, k;
-	double **L, pivo, r;
+	double **L, **U, pivo, r;
 	
 	L = malloc(dim*sizeof(double *));
+	U = malloc(dim*sizeof(double *));
 	
 	for(k=0; k<dim; k++)
 	{
 		L[k][1] = M[k][1];
 		U[k][k] = 1;
-		U[1][j] = M[1][j] / L[1][1];
+		for(j=1; j<dim; j++)
+			U[1][j] = M[1][j] / L[1][1];
+	}
+	
+	for(k=0; k<dim; k++)
+	{
+		for(i=1; i<dim; i++)
+			r += L[i][k]*U[i][k];	
 	}
 	
 	for(i=1; i<dim; i++)
 	{
-			
-			r += L[i][k]*U[i][k];
-			for(j=1; j<dim ;j++)
-				L[i][j] = M[i][j] -r;
+		for(j=1; j<dim; j++)
+				L[i][j] = M[i][j] - r;
 	}
-	
+
 	imprimi(L, dim);
 }
 
@@ -155,7 +159,6 @@ main(int argc, char *argv[] )
 
 	M = malloc( dim*sizeof(double *) );
 	
-	
 	for(i=0; i<dim; i++)
 		M[i] = malloc((dim+1)*sizeof(double));
 	i=j=0;
@@ -171,7 +174,6 @@ main(int argc, char *argv[] )
 			i++;
 		}
 	}
-
 
 	printf("\t\n--------Matriz Aumentada--------\n");
 	imprimi(M, dim);
@@ -200,7 +202,7 @@ main(int argc, char *argv[] )
 	determinante(M, dim, k);
 	
 	//Decomposição LU
-	//LU(M, dim, N);
+	LU(M, dim);
 	//imprimi(LU, dim);
 
 	fclose(op);
