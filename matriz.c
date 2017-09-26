@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 FILE *op;
 
@@ -146,10 +147,59 @@ double **LU(double **M, int dim)
 	imprimi(L, dim);
 }
 
+//Método de Jacobi
+double jacobi(double **M, int dim)
+{
+	double er=1e-5, x0[dim], soma=0, b[dim], x[dim], dis;
+	int i, j, k;
+	
+	
+	for(i=0;i<dim;i++)
+	{
+		//Preenchendo vetor com zeros
+		x[i]=0;
+		//Preencher vetor b 
+		b[i] = M[i][4];
+	}
+	
+	do{
+		
+		for(i=0; i<dim; i++)
+			x0[i]=x[i];
+			
+			
+		dis=0;
+		
+		for(i=0; i<dim; i++)
+		{
+		
+			soma=0;
+			for(j=0; j<dim; j++)
+			{
+				if(j!=i)
+					soma+=M[i][j]*x0[j];
+			}
+			x[i] = (1/M[i][i])*(b[i]-soma);
+			dis += fabs(x0[i]-x[i]);	
+		}
+		
+			
+	}while(dis > er);
+	
+	printf("%.2g\t", dis);
+	printf("\n");
+	printf("%.2g\t", er);
+	for(i=0; i<dim; i++)
+		printf("%.2lf\t", x[i]);
+		
+	printf("\n\n");
+	
+}
+
 
 main(int argc, char *argv[] )
 {
-	double **M, **N, a, aux, pivo, b;
+	double **M, a, aux, pivo, b;
 	int i, j, k, dim, cont;
 
 	op=fopen(argv[1],"r");
@@ -179,7 +229,7 @@ main(int argc, char *argv[] )
 	imprimi(M, dim);
 
 	//fazendo o pivotamento da Matriz
-	for(i=0; i<dim; i++)
+	/*for(i=0; i<dim; i++)
 	{
 		if(M[i][i] == 0)
 		{
@@ -202,8 +252,11 @@ main(int argc, char *argv[] )
 	determinante(M, dim, k);
 	
 	//Decomposição LU
-	LU(M, dim);
-	//imprimi(LU, dim);
+	//LU(M, dim);
+	//imprimi(LU, dim);*/
+	
+	//Método de Jacobi
+	jacobi(M,dim);
 
 	fclose(op);
 }
