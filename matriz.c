@@ -192,7 +192,7 @@ double jacobi(double **M, int dim)
 //Método de Gauss-Siedel
 double gauss(double **M, int dim)
 {
-	double er=1e-5, x0[dim], soma=0, b[dim], x[dim], dis, nite=0;
+	double er=1e-5, x0[dim], soma=0, b[dim], x[dim], dis, nite=0,xtemp ;
 	int i, j, k;
 
 	for(i=0;i<dim;i++)
@@ -202,19 +202,23 @@ double gauss(double **M, int dim)
 	}
 	
 	do{
+		
 		dis=0;
 		for(i=0; i<dim; i++)
 		{
-			x0[i]=x[i];
+			
 			soma=0;
 			for(j=0; j<dim; j++)
 			{
 				if(j!=i)
-					soma+=M[i][j]*x0[j];
+					soma+=M[i][j]*x[j];
 			}
-			x[i] = (1/M[i][i])*(b[i]-soma);
-			dis += fabs(x0[i]-x[i]) / fabs(x[i]);	//distância 
+			
+			xtemp = (1/M[i][i])*(b[i]-soma);
+			dis += fabs(x[i]-xtemp) / fabs(x[i]);	//distância 
+			x[i]=xtemp;
 		}
+		
 		nite++;
 		
 	}while(dis > er);
