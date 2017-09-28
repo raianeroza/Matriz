@@ -150,24 +150,19 @@ double **LU(double **M, int dim)
 //Método de Jacobi
 double jacobi(double **M, int dim)
 {
-	double er=1e-5, x0[dim], soma=0, b[dim], x[dim], dis;
+	double er=1e-5, x0[dim], soma=0, b[dim], x[dim], dis, nite=0;
 	int i, j, k;
-	
-	
+
 	for(i=0;i<dim;i++)
 	{
-		//Preenchendo vetor com zeros
-		x[i]=0;
-		//Preencher vetor b 
-		b[i] = M[i][4];
+		x[i]=0;	//Preenchendo vetor com zeros
+		b[i] = M[i][dim];	//Preencher vetor b
 	}
-	
+
 	do{
-		
+	
 		for(i=0; i<dim; i++)
 			x0[i]=x[i];
-			
-			
 		dis=0;
 		
 		for(i=0; i<dim; i++)
@@ -177,25 +172,60 @@ double jacobi(double **M, int dim)
 			for(j=0; j<dim; j++)
 			{
 				if(j!=i)
-					soma+=M[i][j]*x0[j];
+					soma += M[i][j]*x0[j];
 			}
 			x[i] = (1/M[i][i])*(b[i]-soma);
-			dis += fabs(x0[i]-x[i]);	
+			dis += fabs(x0[i]-x[i]) / fabs(x[i]);	//distância
 		}
+		nite++;
 		
-			
 	}while(dis > er);
 	
-	printf("%.2g\t", dis);
-	printf("\n");
-	printf("%.2g\t", er);
 	for(i=0; i<dim; i++)
 		printf("%.2lf\t", x[i]);
-		
-	printf("\n\n");
+	printf("\n");
+	
+	printf("Iterações Método de Jacobi: %.2lf\n",nite);
 	
 }
 
+//Método de Gauss-Siedel
+double gauss(double **M, int dim)
+{
+	double er=1e-5, x0[dim], soma=0, b[dim], x[dim], dis, nite=0;
+	int i, j, k;
+
+	for(i=0;i<dim;i++)
+	{
+		x[i]=0;	//Preenchendo vetor com zeros
+		b[i] = M[i][dim];	//Preencher vetor b
+	}
+	
+	do{
+		dis=0;
+		for(i=0; i<dim; i++)
+		{
+			x0[i]=x[i];
+			soma=0;
+			for(j=0; j<dim; j++)
+			{
+				if(j!=i)
+					soma+=M[i][j]*x0[j];
+			}
+			x[i] = (1/M[i][i])*(b[i]-soma);
+			dis += fabs(x0[i]-x[i]) / fabs(x[i]);	//distância 
+		}
+		nite++;
+		
+	}while(dis > er);
+	
+	for(i=0; i<dim; i++)
+		printf("%.2lf\t", x[i]);
+	printf("\n");
+	
+	printf("Iterações Método de Gauss-Siedel: %.2lf\n", nite);
+	
+}
 
 main(int argc, char *argv[] )
 {
@@ -257,6 +287,9 @@ main(int argc, char *argv[] )
 	
 	//Método de Jacobi
 	jacobi(M,dim);
+	
+	//Método de Gauss-Siedel
+	gauss(M,dim);
 
 	fclose(op);
 }
