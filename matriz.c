@@ -116,35 +116,44 @@ void determinante(double **M, int dim, int cont)
 		printf("%.2lf\n", -1.0*det);
 }
 
-double **LU(double **M, int dim)
+//Decompisição LU
+double decLU(double **M, int dim)
 {
 	int i, j, k;
-	double **L, **U, pivo, r;
+	double L[dim][dim], u[dim][dim], soma;
 	
-	L = malloc(dim*sizeof(double *));
-	U = malloc(dim*sizeof(double *));
-	
-	for(k=0; k<dim; k++)
+	for(i=0; i<dim; i++)
 	{
-		L[k][1] = M[k][1];
-		U[k][k] = 1;
-		for(j=1; j<dim; j++)
-			U[1][j] = M[1][j] / L[1][1];
+		L[i][0]=M[i][0];
+		u[i][i]=1;
+	}
+	for(j=0; j<dim; j++)
+		u[1][j] = M[1][j]/L[i][i];
+		
+	for(i=1;i<dim;i++)
+	{
+		for(j=1;j<dim;j++)
+		{
+			for(k=0;k<j-1;k++)
+				soma += L[i][k]*u[i][k];
+			L[i][j] = M[i][j] - soma;
+		}
+		
+		for(j=i+1; j<dim; j++)
+		{
+			for(k=0;k<i-1; k++)
+				soma += L[i][k]*u[k][j];
+			u[i][j] = (M[i][j] - soma) / L[i][i];
+		}
 	}
 	
-	for(k=0; k<dim; k++)
+	for(i=0; i<dim; i++)
 	{
-		for(i=1; i<dim; i++)
-			r += L[i][k]*U[i][k];	
+		for(j=0; j<dim; j++)
+			printf("%.2lf\t", u[i][j]);
+		printf("\n");
 	}
 	
-	for(i=1; i<dim; i++)
-	{
-		for(j=1; j<dim; j++)
-				L[i][j] = M[i][j] - r;
-	}
-
-	imprimi(L, dim);
 }
 
 //Método de Jacobi
@@ -192,7 +201,7 @@ double jacobi(double **M, int dim)
 //Método de Gauss-Siedel
 double gauss(double **M, int dim)
 {
-	double er=1e-5, x0[dim], soma=0, b[dim], x[dim], dis, nite=0,xtemp ;
+	double er=1e-5, soma=0, b[dim], x[dim], dis, nite=0,xtemp ;
 	int i, j, k;
 
 	for(i=0;i<dim;i++)
@@ -202,11 +211,9 @@ double gauss(double **M, int dim)
 	}
 	
 	do{
-		
 		dis=0;
 		for(i=0; i<dim; i++)
 		{
-			
 			soma=0;
 			for(j=0; j<dim; j++)
 			{
@@ -220,7 +227,46 @@ double gauss(double **M, int dim)
 		}
 		
 		nite++;
+	}while(dis > er);
+	
+	for(i=0; i<dim; i++)
+		printf("%.2lf\t", x[i]);
+	printf("\n");
+	
+	printf("Iterações Método de Gauss-Siedel: %.2lf\n", nite);
+	
+}
+
+//Método de Relaxação
+
+double Relaxacao(double **M, int dim)
+{
+	double er=1e-5, soma=0, b[dim], x[dim], dis, nite=0,xtemp, r[dim], w;
+	int i, j, k;
+
+	for(i=0;i<dim;i++)
+	{
+		x[i]=0;	//Preenchendo vetor com zeros
+		b[i] = M[i][dim];	//Preencher vetor b
+	}
+	
+	do{
+		dis=0;
+		for(i=0; i<dim; i++)
+		{
+			soma=0;
+			for(j=0; j<dim; j++)
+			{
+				if(j!=i)
+					soma+=M[i][j]*x[j];
+			}
+			
+			xtemp = (1-w)*x[i] + ( (1/M[i][i]) * (w*(b[i]-soma)) );
+			dis += fabs(x[i]-xtemp) / fabs(x[i]);	//distância 
+			x[i]=xtemp;
+		}
 		
+		nite++;
 	}while(dis > er);
 	
 	for(i=0; i<dim; i++)
@@ -294,6 +340,8 @@ main(int argc, char *argv[] )
 	
 	//Método de Gauss-Siedel
 	gauss(M,dim);
+	
+	//Método de Relaxação
 
 	fclose(op);
 }
